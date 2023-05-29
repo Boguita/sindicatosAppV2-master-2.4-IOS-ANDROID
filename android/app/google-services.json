@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "719458333583",
+    "project_id": "uatre-notifacionespush",
+    "storage_bucket": "uatre-notifacionespush.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719458333583:android:2013abcffb196c8e7d51fa",
+        "android_client_info": {
+          "package_name": "com.galgo.sindicato"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719458333583-l5p7rtdj6m0ohiv22kf5uga9rmq15blj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXuKzQKV-l4eLhQxH8if6n5s25N0w3q2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719458333583-l5p7rtdj6m0ohiv22kf5uga9rmq15blj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719458333583-912n634blt8rnd5l6prvnsm1804p8mm1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.galgo.uatre"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719458333583:android:e5320e5cbeda61a17d51fa",
+        "android_client_info": {
+          "package_name": "com.galgo.uatre"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719458333583-l5p7rtdj6m0ohiv22kf5uga9rmq15blj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXuKzQKV-l4eLhQxH8if6n5s25N0w3q2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719458333583-l5p7rtdj6m0ohiv22kf5uga9rmq15blj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719458333583-912n634blt8rnd5l6prvnsm1804p8mm1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.galgo.uatre"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,75 @@
+name: sindicatos
+description: A new Flutter project.
+
+version: 2.0.4
+
+environment:
+  sdk: ">=2.7.6 <3.0.5"
+
+dependencies:
+  carousel_slider: ^4.0.0
+  cupertino_icons: ^1.0.2
+  datetime_picker_formfield: ^2.0.0
+  firebase_core: ^2.8.0
+  firebase_messaging: ^14.3.0
+  
+  flutter:
+    sdk: flutter
+
+  flutter_html: ^2.2.0
+  flutter_launcher_icons: ^0.9.2
+  flutter_linkify: ^5.0.2
+
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_map: ^0.14.0
+  flutter_markdown: ^0.6.8
+  flutter_staggered_grid_view: ^0.3.4
+  google_maps_flutter: ^2.1.1
+  html2md: ^1.2.5
+  http: ^0.13.4
+  image_picker: ^0.8.4+4
+  mailer2: ^1.2.5
+  markdown: ^4.0.1
+  path_provider: ^2.0.7
+  photo_view: ^0.13.0
+  qr_flutter: ^4.0.0
+  random_string: ^2.3.1
+  shared_preferences: ^2.0.9
+  sticky_headers: ^0.2.0
+  url_launcher: ^6.0.15
+  webview_flutter: ^2.3.1
+  geolocator: ^9.0.0
+  directus: ^0.7.0
+  fluttertoast: ^8.0.8
+  flutter_pdfview: ^1.2.2
+  new_version_plus: ^0.0.1+4 
+  animate_do: ^3.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+dependency_overrides:
+  platform: ^3.1.0
+
+flutter_icons:
+  image_path: 'assets/images/logo_iconos.jpg'
+  android: true
+  ios: true
+  flutter_lints: ^1.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Black.otf
+        - asset: assets/fonts/Montserrat-Light.otf
+        - asset: assets/fonts/Montserrat-Regular.otf
+        - asset: assets/fonts/Montserrat-SemiBold.otf
