@@ -7,6 +7,7 @@ import '../LoginPage/RegisterPage.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../LoginPage/LoginPage.dart';
 
 class RecoveryPage extends StatefulWidget {
   @override
@@ -42,7 +43,7 @@ class _RecoveryPageState extends State<RecoveryPage> {
     ];
   }
 
-  void _onPressButton(BuildContext thisContext) async {
+ void _onPressButton(BuildContext thisContext) async {
     dynamic resp2;
     setState(() {
       buttonPressed = true;
@@ -69,41 +70,69 @@ class _RecoveryPageState extends State<RecoveryPage> {
       }
     }
 
-   Map<String, String> headers = {'Content-Type': 'application/json'};
+    // Validar si el campo de correo electrónico está vacío
+    if (listModels[0].controller.text.isEmpty) {
+      showToast('El Correo Electrónico es requerido');
+      setState(() {
+        showLoading = false;
+      });
+      return;
+    }
+
+    // Validar si el campo de correo electrónico es válido
+    if (!isEmailValid(listModels[0].controller.text)) {
+      showToast('El Correo Electrónico debe ser válido');
+      setState(() {
+        showLoading = false;
+      });
+      return;
+    }
+
+    Map<String, String> headers = {'Content-Type': 'application/json'};
     final msg = jsonEncode({
       "email": listModels[0].controller.text,
-      "reset_url": "http://uatre-recovery-password.s3-website-us-east-1.amazonaws.com",
+      "reset_url":
+          "http://uatre-recovery-password.s3-website-us-east-1.amazonaws.com",
     });
     print(headers);
     print(msg);
-    
+
     await http
         .post(Uri.parse(config.url + '/auth/password/request'),
             headers: headers, body: msg)
         .then((response) async {
       print('Response${response.statusCode}');
-      if (response.statusCode == 204) {
+      if (response.statusCode == 204 && [msg] != "") {
         print("Inicio Sesion");
         showToast(
-            'Se enviara un correo electronico a para recuperar la contraseña');
+            'Se enviará un correo electrónico para recuperar la contraseña');
         setState(() {
           showLoading = false;
         });
+        Navigator.of(thisContext).push(new MaterialPageRoute(
+          builder: (BuildContext context) => LoginPage(),
+        ));
       } else {
         setState(() {
           showLoading = false;
         });
         dynamic resp = json.decode(response.body);
         print('Response${resp}');
-        print("Credenciales Invalidas ${resp["errors"][0]["message"]}");
+        print("Credenciales Inválidas ${resp["errors"][0]["message"]}");
         if (resp["errors"][0]["message"].toString() ==
             '"email" must be a valid email') {
-          showToast('El Correo Electrónico debe ser valido');
+          showToast('El Correo Electrónico debe ser válido');
         }
       }
     });
   }
-    
+
+// Función para verificar si el correo electrónico es válido
+  bool isEmailValid(String email) {
+    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$');
+    return emailRegExp.hasMatch(email);
+  }
+
 
     
   //   await http

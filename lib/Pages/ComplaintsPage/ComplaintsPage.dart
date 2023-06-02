@@ -64,32 +64,62 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
           });
     }
 
-    var stream =
-        new http.ByteStream(DelegatingStream.typed(_imageUploaded.openRead()));
-    var length = await _imageUploaded.length();
-    var uri = Uri.parse(config.url + '/files');
+     var stream;
+    var length;
 
-    var request = new http.MultipartRequest("POST", uri);
+    if (_imageUploaded != null) {
+      stream = new http.ByteStream(
+          DelegatingStream.typed(_imageUploaded.openRead()));
+      length = await _imageUploaded.length();
+      var uri = Uri.parse(config.url + '/files');
 
-    // request.fields['refId'] = idUpload.toString();
-    request.fields['ref'] = "Denuncia";
-    request.fields['field'] = "Imagen";
+      var request = new http.MultipartRequest("POST", uri);
 
-    var multipartFile = new http.MultipartFile('files', stream, length,
+      request.fields['ref'] = "Denuncia";
+      request.fields['field'] = "Imagen";
+
+      var multipartFile = new http.MultipartFile(
+        'files',
+        stream,
+        length,
         filename: Path.basename(_imageUploaded.path),
-        contentType: new MediaType('image', 'png'));
+        contentType: new MediaType('image', 'png'),
+      );
 
-    request.files.add(multipartFile);
+      request.files.add(multipartFile);
 
-    var responseUpd = await request.send();
-    print(responseUpd.statusCode);
+      var responseUpd = await request.send();
+      print(responseUpd.statusCode);
 
-    responseUpd.stream.transform(utf8.decoder).listen((value) async {
-      print(value);
-      dynamic responseData = json.decode(value);
-      idImage = responseData['data']['id'];
-      print(idImage);
+      responseUpd.stream.transform(utf8.decoder).listen((value) async {
+        print(value);
+        dynamic responseData = json.decode(value);
+        idImage = responseData['data']['id'];
+        print(idImage);
 
+        var user = widget.user.id;
+
+        String iduser = user;
+        print('iduser $iduser');
+
+        Map<String, dynamic> map = {
+          'provincia': provinciaController.text,
+          'localidad': localidadController.text,
+          'denuncia': complaintController.text,
+          'miembros': iduser,
+          'imagen': idImage,
+        };
+        String jsonBody = json.encode(map);
+        final response = await http.post(
+          Uri.parse(config.url + '/items/denuncias'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonBody,
+        );
+
+        dynamic result = json.decode(response.body);
+        print('Result $result');
+      });
+    } else {
       var user = widget.user.id;
 
       String iduser = user;
@@ -100,7 +130,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
         'localidad': localidadController.text,
         'denuncia': complaintController.text,
         'miembros': iduser,
-        'imagen': idImage,
+        'imagen':
+            null, // Establece la imagen como nula si no se seleccionó ninguna
       };
       String jsonBody = json.encode(map);
       final response = await http.post(
@@ -111,7 +142,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
 
       dynamic result = json.decode(response.body);
       print('Result $result');
-    });
+    }
   }
 
   Future getImage() async {
