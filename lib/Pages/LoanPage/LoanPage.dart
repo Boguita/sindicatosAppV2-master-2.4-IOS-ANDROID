@@ -28,26 +28,25 @@ class _LoanPageState extends State<LoanPage> {
   List<String> listLoansSelect = [];
   String dropdownValue;
   String todos = "Todos los Años";
+  int visibleLoanCount = 10;
 
   void initState() {
     super.initState();
 
     fetchLoanFuture.then((loanList) {
-      setState(
-        () {
-          this.listLoans = loanList;
-        },
-      );
+      setState(() {
+        this.listLoans = loanList;
+        _sortLoans();
+      });
     });
 
+    // Listener del dropdown
     fetchAnoFuture.then((anos) {
-      setState(
-        () {
-          this.listLoansSelect.add(todos);
-          this.listLoansSelect.addAll(anos);
-          this.dropdownValue = listLoansSelect.first;
-        },
-      );
+      setState(() {
+        this.listLoansSelect.add(todos);
+        this.listLoansSelect.addAll(anos);
+        this.dropdownValue = listLoansSelect.first;
+      });
     });
   }
 
@@ -159,32 +158,56 @@ class _LoanPageState extends State<LoanPage> {
         height: 40.0,
         width: 150,
         child: MaterialButton(
-            height: 30.0,
-            color: Color(0XFF81935a),
-            textColor: Colors.white,
-            onPressed: () async {
-              final Future<List<Loan>> fetchLoanResol =
-                  getResoluciones(this.dropdownValue, searchController.text);
-              fetchLoanResol.then((loanList) {
+          height: 30.0,
+          color: Color(0XFF81935a),
+          textColor: Colors.white,
+          onPressed: () async {
+           if (searchController.text.isEmpty && dropdownValue == todos) {
+              // Realizar la acción para devolver la lista completa de préstamos de todos los años
+             
+              fetchLoanFuture.then((loanList) {
                 setState(() {
                   this.listLoans = loanList;
+                  visibleLoanCount = 10;
+                });
+                 
+              });
+            } else {
+             
+              // Realizar la búsqueda en función del valor seleccionado del dropdown y el texto de búsqueda
+              final Future<List<Loan>> fetchLoanResol =
+                  getResoluciones(dropdownValue, searchController.text);
+              fetchLoanResol.then((loanList) {
+                setState(() {
+                   print("entro 2");
+                  this.listLoans = loanList;
+                  visibleLoanCount = 10;
+                  
                 });
               });
-            },
-            child: Text('Buscar',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
-                    color: Colors.white)),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50.0))),
+            }
+          },
+          child: Text(
+            'Buscar',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14.0,
+              color: Colors.white,
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+        ),
       ),
     );
-    
-    _sortLoans();
 
     if (listLoans.length > 0) {
-      for (var i = 0; i < listLoans.length; i++) {
+      int endIndex = visibleLoanCount <= listLoans.length
+          ? visibleLoanCount
+          : listLoans.length;
+
+      for (var i = 0; i < endIndex; i++) {
         contentCells.add(Container(
           margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
@@ -252,6 +275,26 @@ class _LoanPageState extends State<LoanPage> {
           ),
         ));
       }
+
+      if (visibleLoanCount < listLoans.length) {
+        contentCells.add(
+       Center(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Color(0XFF3a5b40)),
+              ),
+              onPressed: () {
+                setState(() {
+                  visibleLoanCount += 10;
+                });
+              },
+              child: Text('Cargar más'),
+            ),
+          ),
+
+        );
+      }
     } else {
       contentCells.add(Text('No se han encontrado resultados.'));
       contentCells.add(SizedBox(height: 10.0));
@@ -311,46 +354,52 @@ class _LoanPageState extends State<LoanPage> {
     );
 
     return ListView(
-        shrinkWrap: true,
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: <Widget>[
-          StickyHeader(
-            header: Column(children: initialCell),
-            content: Column(children: cellsToShow),
-          )
-        ]);
+      shrinkWrap: true,
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: <Widget>[
+        StickyHeader(
+          header: Column(children: initialCell),
+          content: Column(children: cellsToShow),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(0, 75),
-          child: CustomAppBar(),
+      appBar: PreferredSize(
+        preferredSize: Size(0, 75),
+        child: CustomAppBar(),
+      ),
+      backgroundColor: Color(0xFFF6F6F6),
+      drawer: new AppDrawer(
+        user: widget.user,
+      ),
+      body: new Container(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: listLoans == null ? LoadingComponent() : _getLoansList(),
+            ),
+          ],
         ),
-        backgroundColor: Color(0xFFF6F6F6),
-        drawer: new AppDrawer(
-          user: widget.user,
-        ),
-        body: new Container(
-            child: Column(children: <Widget>[
-          Expanded(
-              child: listLoans == null ? LoadingComponent() : _getLoansList()),
-        ])));
+      ),
+    );
   }
 
   _sortLoans() {
-    Set<String> years = { for(final loan in listLoans) loan.ano };
-    Map<String, List<Loan>> filtered = { for (final year in years) year: [] };
+    Set<String> years = {for (final loan in listLoans) loan.ano};
+    List<String> sortedYears = years.toList()..sort((a, b) => b.compareTo(a));
 
-    for(final loan in listLoans) {
-      filtered[loan.ano].add(loan);
-    }
-
-    listLoans.clear();
-    filtered.forEach((key, value) {
-      value.sort((loan1, loan2) => loan2.numero.compareTo(loan1.numero));
-      listLoans.addAll(value);
+    listLoans.sort((loan1, loan2) {
+      // Ordenar por año en forma descendente
+      int yearComparison = loan2.ano.compareTo(loan1.ano);
+      if (yearComparison != 0) {
+        return yearComparison;
+      }
+      // Ordenar por número de resolución en forma descendente
+      return loan2.numero.compareTo(loan1.numero);
     });
   }
 }
